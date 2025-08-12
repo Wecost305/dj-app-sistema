@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Iniciar Sesión - DJ Dashboard</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Reutilizamos los estilos existentes -->
+</head>
+<body class="auth-body">
+
+    <div class="auth-container">
+        <div class="auth-form-container">
+            <div class="logo-container">
+                <img src="logo.png" alt="Logo" class="logo">
+                <h1>DJ Dashboard</h1>
+            </div>
+            <h2 class="auth-title">Iniciar Sesión</h2>
+            
+            <form id="login-form">
+                <div class="input-group">
+                    <input type="email" id="email" required autocomplete="email">
+                    <label for="email">Email</label>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="password" required autocomplete="current-password">
+                    <label for="password">Contraseña</label>
+                </div>
+                <button type="submit" class="neon-button">Entrar</button>
+            </form>
+
+            <div id="error-message" class="error-message"></div>
+            
+            <p class="auth-switch">¿No tienes una cuenta? <a href="/register.h">Contactame</a></p>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+</body>
+</html>

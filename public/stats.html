@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas - DJ Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo-container">
+            <img src="logo.png" alt="Logo" class="logo">
+            <h1 id="welcome-message">Cargando...</h1>
+        </div>
+        <nav class="main-nav">
+            <a href="/" class="nav-link">Dashboard</a>
+            <a href="/stats.html" class="nav-link active">Estadísticas</a>
+            <form action="/api/logout" method="POST" style="display: inline;">
+                <button type="submit" id="logout-button" class="neon-button-reset">Cerrar Sesión</button>
+            </form>
+        </nav>
+        <div id="clock" class="clock">--:--:--</div>
+    </header>
+
+    <main class="stats-main">
+        <div class="stats-header">
+            <h2>Análisis de Rendimiento</h2>
+            <div class="filter-container">
+                <label for="event-filter">Filtrar por Evento:</label>
+                <select id="event-filter">
+                    <option value="">Todos los Eventos (Global )</option>
+                </select>
+            </div>
+        </div>
+        <div class="kpi-row">
+            <div class="kpi-card"><h3>Tasa de Reproducción</h3><p id="kpi-play-rate">0%</p></div>
+            <div class="kpi-card"><h3>Total Solicitudes</h3><p id="kpi-total-requests">0</p></div>
+            <div class="kpi-card"><h3>Canción Más Pedida</h3><p id="kpi-top-song">N/A</p></div>
+        </div>
+        <div class="stats-grid">
+            <div class="stats-card"><h3>Flujo por Hora</h3><canvas id="hourly-flow-chart"></canvas></div>
+            <div class="stats-card"><h3>Top Canciones</h3><canvas id="top-songs-chart"></canvas></div>
+        </div>
+        <div id="event-songs-container" class="stats-card" style="display: none;">
+            <h3>Canciones del Evento</h3>
+            <table id="event-songs-table">
+                <thead><tr><th>Canción</th><th>Solicitante</th><th>Estado</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <p>&copy; 2025 TuEmpresa DJ - Sistema de Solicitudes v4.0</p>
+    </footer>
+
+    <script src="stats.js"></script>
+</body>
+</html>

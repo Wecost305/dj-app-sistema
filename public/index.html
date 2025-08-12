@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DJ Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo-container">
+            <img src="logo.png" alt="Logo" class="logo">
+            <h1 id="welcome-message">Cargando...</h1>
+        </div>
+        <nav class="main-nav">
+            <a href="/" class="nav-link active">Dashboard</a>
+            <a href="/stats.html" class="nav-link">Estadísticas</a>
+            <form action="/api/logout" method="POST" style="display: inline;">
+                <button type="submit" class="neon-button-reset">Cerrar Sesión</button>
+            </form>
+        </nav>
+        <div id="clock" class="clock">--:--:--</div>
+    </header>
+
+    <main class="dashboard-main">
+        <!-- INICIO: Panel de Control de la Sala del DJ (LA SECCIÓN QUE FALTABA) -->
+        <div class="sala-controls">
+            <div class="sala-toggle-container">
+                <label class="switch">
+                    <input type="checkbox" id="sala-toggle">
+                    <span class="slider round"></span>
+                </label>
+                <div id="sala-status-text" class="sala-status">Sala Cerrada</div>
+            </div>
+            <div class="public-url-container">
+                <label for="public-url-input">Tu URL Pública Permanente:</label>
+                <div class="input-group">
+                    <input type="text" id="public-url-input" readonly>
+                    <button id="copy-url-button">Copiar</button>
+                </div>
+            </div>
+            <div class="session-clear-container">
+                <button id="clear-session-button" class="neon-button-reset">Limpiar Sesión Actual</button>
+            </div>
+        </div>
+        <!-- FIN: Panel de Control de la Sala del DJ -->
+
+        <!-- Fila de Contadores (KPIs) -->
+        <div class="stats-row">
+            <div class="stat-box"><h3>Pendientes</h3><p id="pending-count">0</p></div>
+            <div class="stat-box"><h3>Reproducidas</h3><p id="played-count">0</p></div>
+            <div class="stat-box"><h3>Canceladas</h3><p id="canceled-count">0</p></div>
+            <div class="stat-box total"><h3>Total</h3><p id="total-count">0</p></div>
+        </div>
+
+        <!-- Contenedor de las Columnas de Canciones -->
+        <div class="dashboard-columns">
+            <div class="column" id="pending-column"><h2><span class="col-icon">📥</span> Pendientes</h2></div>
+            <div class="column" id="played-column"><h2><span class="col-icon">🎶</span> Reproducidas</h2></div>
+            <div class="column" id="canceled-column"><h2><span class="col-icon">✖️</span> Canceladas</h2></div>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <p>&copy; 2025 TuEmpresa DJ - Sistema de Solicitudes v5.0</p>
+    </footer>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
