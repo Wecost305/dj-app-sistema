@@ -2,7 +2,7 @@
 
 // 1. IMPORTACIONES
 const express = require('express');
-const http = require('http' );
+const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
 const cors = require('cors');
@@ -14,7 +14,7 @@ const bcrypt = require('bcrypt');
 
 // 2. CONFIGURACIÓN INICIAL
 const app = express();
-const server = http.createServer(app );
+const server = http.createServer(app);
 const io = socketIo(server, { cors: { origin: "*", methods: ["GET", "POST"] } });
 const PORT = 3000;
 
@@ -71,6 +71,18 @@ passport.deserializeUser(async (id, done) => {
 function isAuthenticated(req, res, next) {
     if (req.isAuthenticated()) return next();
     res.redirect('/login.html');
+}
+function isAdmin(req, res, next) {
+    // Primero, nos aseguramos de que esté logueado
+    if (!req.isAuthenticated()) {
+        return res.redirect('/login.html');
+    }
+    // Luego, verificamos si su rol es 'admin'
+    if (req.user.role === 'admin') {
+        return next(); // Si es admin, le permitimos continuar
+    }
+    // Si no es admin, lo enviamos al dashboard normal con un mensaje de error (opcional)
+    res.status(403).send('Acceso Prohibido: Esta página es solo para administradores.');
 }
 
 // 7. RUTAS DE LA APLICACIÓN
@@ -152,11 +164,38 @@ app.post('/api/solicitud', async (req, res) => {
     } catch (err) { res.status(500).send('Error al guardar la solicitud.'); }
 });
 
+// Obtener todos los usuarios (excepto el propio admin)
+app.get('/api/admin/users', isAdmin, async (req, res) => {
+    try {
+        // El req.user.id viene del admin que está haciendo la petición
+        const result = await pool.query('SELECT id, dj_name, email, role FROM djs WHERE id != $1 ORDER BY id ASC', [req.user.id]);
+        res.json(result.rows);
+    } catch (err) {
+        res.status(500).json({ message: 'Error al obtener usuarios.' });
+    }
+});
+
+// Eliminar un usuario
+app.delete('/api/admin/users/:id', isAdmin, async (req, res) => {
+    const userIdToDelete = req.params.id;
+    try {
+        await pool.query('DELETE FROM djs WHERE id = $1', [userIdToDelete]);
+        res.status(200).json({ message: 'Usuario eliminado con éxito.' });
+    } catch (err) {
+        res.status(500).json({ message: 'Error al eliminar el usuario.' });
+    }
+});
+
 // --- Rutas de Páginas ---
 app.get('/', isAuthenticated, (req, res) => { res.sendFile(path.join(__dirname, 'public', 'index.html')); });
 app.get('/stats.html', isAuthenticated, (req, res) => { res.sendFile(path.join(__dirname, 'public', 'stats.html')); });
 
 app.use(express.static(path.join(__dirname, 'public')));
+
+
+app.get('/admin', isAdmin, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
 
 // 8. LÓGICA DE SOCKET.IO (Modificada)
 const wrap = middleware => (socket, next) => middleware(socket.request, {}, next);
@@ -175,7 +214,7 @@ io.on('connection', (socket) => {
             socket.emit('sesion_actual', result.rows);
         } catch (err) { console.error(err); }
     });
-    
+
     socket.on('actualizar_estado', async ({ id, estado }) => {
         try {
             const result = await pool.query('UPDATE solicitudes SET estado = $1 WHERE id = $2 RETURNING *', [estado, id]);
@@ -188,7 +227,18 @@ io.on('connection', (socket) => {
 async function initializeDatabase() {
     const client = await pool.connect();
     try {
-        await client.query(`CREATE TABLE IF NOT EXISTS djs (id SERIAL PRIMARY KEY, email VARCHAR(255) UNIQUE NOT NULL, password_hash VARCHAR(255) NOT NULL, dj_name VARCHAR(100) NOT NULL, public_slug VARCHAR(50) UNIQUE, is_accepting_requests BOOLEAN DEFAULT FALSE, created_at TIMESTAMPTZ DEFAULT NOW());`);
+       await client.query(`
+    CREATE TABLE IF NOT EXISTS djs (
+        id SERIAL PRIMARY KEY,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password_hash VARCHAR(255) NOT NULL,
+        dj_name VARCHAR(100) NOT NULL,
+        public_slug VARCHAR(100) UNIQUE,
+        is_accepting_requests BOOLEAN DEFAULT FALSE,
+        -- NUEVA COLUMNA PARA EL ROL --
+        role VARCHAR(50) NOT NULL DEFAULT 'dj'
+    );
+`);
         // La tabla de solicitudes ahora se relaciona directamente con el DJ
         await client.query(`CREATE TABLE IF NOT EXISTS solicitudes (id SERIAL PRIMARY KEY, dj_id INTEGER REFERENCES djs(id) ON DELETE CASCADE, cancion TEXT NOT NULL, solicitante TEXT NOT NULL, dedicatoria TEXT, estado VARCHAR(50) NOT NULL DEFAULT 'pendiente', created_at TIMESTAMPTZ DEFAULT NOW());`);
         // La tabla de eventos ya no es necesaria en este modelo, la puedes eliminar si quieres.
@@ -198,6 +248,6 @@ async function initializeDatabase() {
 }
 
 server.listen(PORT, () => {
-    console.log(`=== Servidor listo en http://localhost:${PORT} ===` );
+    console.log(`=== Servidor listo en http://localhost:${PORT} ===`);
     // ...
 });

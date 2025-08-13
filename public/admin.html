@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Gestión de Usuarios</title>
+    <!-- Reutilizamos la misma hoja de estilos para un look consistente -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo-container">
+            <img src="logo.png" alt="Logo" class="logo">
+            <!-- El nombre del admin se cargará aquí -->
+            <h1 id="welcome-message">Panel de Administración</h1>
+        </div>
+        <nav class="main-nav">
+            <!-- Enlaces para navegar entre el dashboard normal y el panel de admin -->
+            <a href="/" class="nav-link">Mi Dashboard</a>
+            <a href="/admin" class="nav-link active">Gestionar Usuarios</a>
+            <form action="/api/logout" method="POST" style="display: inline;">
+                <button type="submit" class="neon-button-reset">Cerrar Sesión</button>
+            </form>
+        </nav>
+        <div id="clock" class="clock">--:--:--</div>
+    </header>
+
+    <main class="dashboard-main">
+        <div class="stats-card"> <!-- Reutilizamos el estilo de tarjeta para un buen contenedor -->
+            <h3><span class="col-icon">👥</span> Usuarios Registrados</h3>
+            <p id="loading-message">Cargando lista de usuarios...</p>
+            
+            <!-- La tabla donde se mostrarán los usuarios -->
+            <div class="table-wrapper">
+                <table id="users-table" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre del DJ</th>
+                            <th>Email</th>
+                            <th>Rol</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <!-- El cuerpo de la tabla se llenará dinámicamente -->
+                    <tbody id="users-table-body">
+                        <!-- Las filas de usuarios se insertarán aquí -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <p>&copy; 2025 TuEmpresa DJ - Panel de Administración</p>
+    </footer>
+
+    <!-- Conectamos el nuevo script de lógica para esta página -->
+    <script src="admin.js"></script>
+</body>
+</html>
